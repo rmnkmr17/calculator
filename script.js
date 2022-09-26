@@ -27,4 +27,20 @@ function operate(operator, num1, num2) {
     }
 };
 
-console.log(operate("/", 5, 5));
+// Create the functions that populate the display when you click the number buttons. You should be storing the ‘display value’ in a variable somewhere for use in the next step.
+
+let displayValue = "";
+let display = document.querySelector(".display");
+
+
+let numbers = document.querySelectorAll(".number");
+numbers.forEach((number) => number.addEventListener("click", function(e){
+    showNumber(e.target.textContent);
+    display.textContent = displayValue;
+}));
+
+function showNumber(num) {
+    if (displayValue.length <= 5) {
+        displayValue += num;
+    }
+}
