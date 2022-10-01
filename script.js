@@ -22,14 +22,45 @@ const calculator = {
 };
 
 function inputNumber(num) {
-    const { displayValue } = calculator;
-    calculator.displayValue = displayValue === "0" ? num : displayValue + num;
+    const { displayValue, expectNum2 } = calculator;
+
+    if (expectNum2 === true) {
+        calculator.displayValue = num;
+        calculator.expectNum2 = false;
+    } else {
+        calculator.displayValue = displayValue === "0" ? num : displayValue + num;
+    }
+    console.log(calculator);
+
 }
 
 function inputDecimal(dot) {
     if (!calculator.displayValue.includes(dot)) {
         calculator.displayValue += dot;
     }
+}
+
+function handleOperator(nextOperator) {
+    const { num1, displayValue, operator } = calculator;
+    const inputValue = parseFloat(displayValue);
+
+    if (operator && calculator.expectNum2)  {
+        calculator.operator = nextOperator;
+        console.log(calculator);
+        return;
+      }
+
+    if (num1 === null && !isNaN(inputValue)) {
+        calculator.num1 = inputValue;
+    } else if (operator) {
+        const result = operate(num1, inputValue, operator);
+        calculator.displayValue = String(result);
+        calculator.num1 = result;
+    }
+
+    calculator.expectNum2 = true;
+    calculator.operator = nextOperator;
+    console.log(calculator);
 }
 
 function operate(num1, num2, operator) {
@@ -51,6 +82,13 @@ function operate(num1, num2, operator) {
     }
 };
 
+function clearCalculator() {
+    calculator.displayValue = "0";
+    calculator.num1 = null;
+    calculator.expectNum2 = false;
+    calculator.operator = null;
+
+}
 function updateDisplay() {
     const display = document.querySelector(".display");
     display.value = calculator.displayValue;
@@ -66,7 +104,8 @@ buttons.addEventListener("click", (event) => {
     }
 
     if (target.classList.contains("operator")) {
-        console.log("operator", target.value);
+        handleOperator(target.value);
+        updateDisplay();
         return;
     }
 
@@ -77,10 +116,13 @@ buttons.addEventListener("click", (event) => {
     }
 
     if (target.classList.contains("clear")) {
-        console.log("clear", target.value);
+        clearCalculator();
+        updateDisplay();
         return;
     }
 
     inputNumber(target.value);
     updateDisplay();
+
+
 })
