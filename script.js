@@ -48,17 +48,17 @@ function handleOperator(nextOperator) {
     const { num1, displayValue, operator } = calculator;
     const inputValue = parseFloat(displayValue);
 
-    if (operator && calculator.expectNum2)  {
+    if (operator && calculator.expectNum2) {
         calculator.operator = nextOperator;
         console.log(calculator);
         return;
-      }
+    }
 
     if (num1 === null && !isNaN(inputValue)) {
         calculator.num1 = inputValue;
     } else if (operator) {
         const result = operate(num1, inputValue, operator);
-        calculator.displayValue = String(result);
+        calculator.displayValue = `${parseFloat(result.toFixed(7))}`;
         calculator.num1 = result;
     }
 
@@ -92,6 +92,22 @@ function clearCalculator() {
     calculator.operator = null;
 
 }
+
+function undoNumber() {
+    if (calculator.expectNum2 === true && 
+        calculator.operator === "+" ||
+        calculator.operator === "-" ||
+        calculator.operator === "*" ||
+        calculator.operator === "/"
+        ) {
+        calculator.operator = null;
+        calculator.expectNum2 = false;
+        calculator.num1 = null;
+        } else {
+            calculator.displayValue = calculator.displayValue.slice(0, -1);
+        }
+}
+
 function updateDisplay() {
     const display = document.querySelector(".display");
     display.value = calculator.displayValue;
@@ -104,26 +120,30 @@ buttons.addEventListener('click', event => {
     const { target } = event;
     const { value } = target;
     if (!target.matches('button')) {
-      return;
+        return;
     }
     switch (value) {
-      case "+":
-      case "-":
-      case "*":
-      case "/":
-      case "=":
-        handleOperator(value);
-        break;
-      case ".":
-        inputDecimal(value);
-        break;
-      case "C":
-        clearCalculator();
-        break;
-      default:
-        if (Number.isInteger(parseFloat(value))) {
-          inputNumber(value);
-        }
+        case "+":
+        case "-":
+        case "*":
+        case "/":
+        case "=":
+            handleOperator(value);
+            break;
+        case ".":
+            inputDecimal(value);
+            break;
+        case "C":
+            clearCalculator();
+            break;
+        case "delete":
+            undoNumber();
+            break;
+        default:
+            if (Number.isInteger(parseFloat(value))) {
+                inputNumber(value);
+            }
     }
     updateDisplay();
-  });
+    console.log(calculator)
+});
