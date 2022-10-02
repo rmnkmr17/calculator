@@ -30,11 +30,15 @@ function inputNumber(num) {
     } else {
         calculator.displayValue = displayValue === "0" ? num : displayValue + num;
     }
-    console.log(calculator);
-
 }
 
 function inputDecimal(dot) {
+    if (calculator.expectNum2 === true) {
+        calculator.displayValue = "0.";
+        calculator.expectNum2 = false;
+        return;
+    }
+
     if (!calculator.displayValue.includes(dot)) {
         calculator.displayValue += dot;
     }
@@ -60,7 +64,6 @@ function handleOperator(nextOperator) {
 
     calculator.expectNum2 = true;
     calculator.operator = nextOperator;
-    console.log(calculator);
 }
 
 function operate(num1, num2, operator) {
@@ -97,32 +100,30 @@ function updateDisplay() {
 updateDisplay();
 
 const buttons = document.querySelector(".buttons");
-buttons.addEventListener("click", (event) => {
+buttons.addEventListener('click', event => {
     const { target } = event;
-    if (!target.matches("button")) {
-        return;
+    const { value } = target;
+    if (!target.matches('button')) {
+      return;
     }
-
-    if (target.classList.contains("operator")) {
-        handleOperator(target.value);
-        updateDisplay();
-        return;
-    }
-
-    if (target.classList.contains("decimal")) {
-        inputDecimal(target.value);
-        updateDisplay();
-        return;
-    }
-
-    if (target.classList.contains("clear")) {
+    switch (value) {
+      case "+":
+      case "-":
+      case "*":
+      case "/":
+      case "=":
+        handleOperator(value);
+        break;
+      case ".":
+        inputDecimal(value);
+        break;
+      case "C":
         clearCalculator();
-        updateDisplay();
-        return;
+        break;
+      default:
+        if (Number.isInteger(parseFloat(value))) {
+          inputNumber(value);
+        }
     }
-
-    inputNumber(target.value);
     updateDisplay();
-
-
-})
+  });
