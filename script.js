@@ -50,7 +50,6 @@ function handleOperator(nextOperator) {
 
     if (operator && calculator.expectNum2) {
         calculator.operator = nextOperator;
-        console.log(calculator);
         return;
     }
 
@@ -64,6 +63,7 @@ function handleOperator(nextOperator) {
 
     calculator.expectNum2 = true;
     calculator.operator = nextOperator;
+    console.log(calculator)
 }
 
 function operate(num1, num2, operator) {
@@ -94,26 +94,31 @@ function clearCalculator() {
 }
 
 function undoNumber() {
-    if (calculator.expectNum2 === true && 
+    if (calculator.expectNum2 === true &&
         calculator.operator === "+" ||
         calculator.operator === "-" ||
         calculator.operator === "*" ||
         calculator.operator === "/"
-        ) {
+    ) {
         calculator.operator = null;
         calculator.expectNum2 = false;
         calculator.num1 = null;
-        } else {
-            calculator.displayValue = calculator.displayValue.slice(0, -1);
-        }
+    } else if (calculator.operator === "=" || calculator.operator === "Enter" && calculator.expectNum2 === true) {
+        calculator.operator = null;
+        calculator.num1 = null;
+        calculator.expectNum2 = false;
+        calculator.displayValue = calculator.displayValue.slice(0, -1);
+    }
+    else {
+        calculator.displayValue = calculator.displayValue.slice(0, -1);
+    }
+    console.log(calculator)
 }
 
 function updateDisplay() {
     const display = document.querySelector(".display");
     display.value = calculator.displayValue;
 }
-
-updateDisplay();
 
 const buttons = document.querySelector(".buttons");
 buttons.addEventListener('click', event => {
@@ -146,4 +151,43 @@ buttons.addEventListener('click', event => {
     }
     updateDisplay();
     console.log(calculator)
+
 });
+
+function addKeyboardSupport(e) {
+    document.addEventListener("keydown", getKeyboardInput)
+}
+
+function getKeyboardInput(event) {
+    if (event.key >= "0" && event.key <= "9") {
+        inputNumber(event.key);
+        updateDisplay();
+    }
+
+    if (event.key === "Backspace") {
+        undoNumber();
+        updateDisplay();
+    }
+    if (event.key === ".") {
+        inputDecimal(event.key);
+        updateDisplay();
+    }
+
+    if (event.key === "Delete") {
+        clearCalculator();
+        updateDisplay();
+    }
+
+    if (event.key === "+" ||
+        event.key === "-" ||
+        event.key === "*" ||
+        event.key === "/" ||
+        event.key === "=" ||
+        event.key === "Enter") {
+        handleOperator(event.key);
+        updateDisplay();
+    }
+}
+
+updateDisplay();
+addKeyboardSupport();
